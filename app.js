@@ -3,9 +3,9 @@ const app = express()
 const port = process.env.PORT || 3000
 import cors from "cors";
 import indexRouter from './src/modules/index.router.js';
-import sequelize from './src/database/dbConnection.js';
+import connection from './src/database/dbConnection.js';
 
-await sequelize.sync({ alter: true, force: false });
+await connection.sync({ alter: true, force: false });
 
 app.use(express.json())
 app.use(cors())

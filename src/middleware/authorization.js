@@ -1,16 +1,22 @@
 import jwt from "jsonwebtoken";
 import { userModel } from "../database/models/user.model.js";
+import { postModel } from "../database/models/posts.model.js";
 
-const authenticatedToken = async (req, res, next) => {
+const postAuthorized = async (req, res, next) => {
   const token = req.headers.token;
-  let decoded = jwt.verify(token, "hambozo");
-  let user = await userModel.findOne({ where: { email: decoded.id } });
-  if (decoded) {
-    req.user= user
-    next();
-  } else {
-    return res.status(403).json({ message: "Unauthorized 1" });
-  }
+  jwt.verify(token, "hambozo",async (error, decoded)=>{
+    if (error) {
+      res.status(401).json({message: 'Invalid token'})
+    } else {
+      let {id} = decoded;
+      let allowed = await postModel.findOne({ where: { userId: id } });
+      if (allowed) {
+        next();
+      } else {
+        res.status(403).json({message: "Not allowed to do actions on this post"})
+      }
+    }
+  });
 };
 
-export default authenticatedToken;
+export default postAuthorized;

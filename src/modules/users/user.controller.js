@@ -33,26 +33,26 @@ const updateUser = async (req, res) => {
     { userName: req.body.userName, password: req.body.password },
     { where: { id: req.params.id } }
   );
-  res.status(201).json({ message: "userName updated succesfully" });
+  res.status(201).json({ message: "Updated succesfully" });
 };
 
 const userRegister = async (req, res) => {
   await userModel.create(req.body);
-  res.status(201).json({ message: "Success" });
+  res.status(201).json({ message: "Account created successfully." });
 };
 
 const userlogin = async (req, res) => {
-  jwt.sign(req.body.email, "hambozo", (err, token) => {
+  const user = await userModel.findOne({ where: { email: req.body.email } });
+  console.log(user);
+  
+  jwt.sign( user.dataValues , "hambozo", (err, token) => {
     if (err) {
       console.log(err);
-      res.status(500).json({ message: "internal server error" });
-      return;
+      return res.status(500).json({ message: "internal server error 3" , Error: err });
     } else {
-      res.status(201).json({ message: "Success", token });
+      res.status(201).json({ message: "Loged in successfully", token });
     }
   });
-  // const {id} = await userModel.findOne({ where: { email: req.body.email } });
-  // return id;
 };
 
 export { userRegister, getAllUsers, getSpecificUser, updateUser, userlogin };
